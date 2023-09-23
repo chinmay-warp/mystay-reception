@@ -6,44 +6,42 @@ import { useNavigate } from "react-router-dom";
 const Search = () => {
   const { userData, setUserData, accessToken, setAccessToken } =
     React.useContext(UserContext);
-    const [loading, setLoading] = React.useState(false);
-    const navigate = useNavigate();
-    const [bookings , setBookings] = React.useState([]);
-    const [email , setEmail] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const navigate = useNavigate();
+  const [bookings, setBookings] = React.useState([]);
+  const [email, setEmail] = React.useState("");
 
-    const getUserData = async (token) => {
-        const response = await fetch(
-            `${process.env.REACT_APP_SERVER_URL}/partner/reception`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-access-token": token,
-                },
-            }
-        );
+  const getUserData = async (token) => {
+    const response = await fetch(
+      `${process.env.REACT_APP_SERVER_URL}/partner/reception`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token,
+        },
+      }
+    );
 
-        const data = await response.json();
-        console.log(data);
-        if (data.success === true && data.data) {
-            setUserData(data.data);
-        }
+    const data = await response.json();
+    console.log(data);
+    if (data.success === true && data.data) {
+      setUserData(data.data);
     }
+  };
 
-    React.useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token && !accessToken) {
-            navigate("/login");
-        }
-        if (!accessToken) {
-            setAccessToken(token);
-        }
-        if (!userData) {
-            
-            getUserData(token);
-        }
-
-    }, []);
+  React.useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token && !accessToken) {
+      navigate("/login");
+    }
+    if (!accessToken) {
+      setAccessToken(token);
+    }
+    if (!userData) {
+      getUserData(token);
+    }
+  }, []);
   const {
     register,
     handleSubmit,
@@ -53,27 +51,29 @@ const Search = () => {
   const onSubmit = async (data) => {
     setEmail(data.email);
     try {
-        fetch(`${process.env.REACT_APP_SERVER_URL}/partner/reception/getBookings`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-access-token": accessToken,
-            },
-            body: JSON.stringify({
-                email: data.email,
-                hotelId: userData.hotelDetails.hotelId,
-            }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-                if (data.success === true) {
-                    setBookings(data.message);
-                }
-            });
-
+      fetch(
+        `${process.env.REACT_APP_SERVER_URL}/partner/reception/getBookings`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": accessToken,
+          },
+          body: JSON.stringify({
+            email: data.email,
+            hotelId: userData.hotelDetails.hotelId,
+          }),
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          if (data.success === true) {
+            setBookings(data.message);
+          }
+        });
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
   };
   return (
@@ -101,77 +101,90 @@ const Search = () => {
             btnText="Search"
           />
         </div>
-
       </form>
 
       <div className="flex flex-wrap gap-3 items-center">
-
-      {bookings.length > 0 ? (
+        {bookings.length > 0 ? (
           bookings.map((booking, index) => {
             let amount = 0;
-            if(booking.status === "CheckedIn"){
-              fetch(`${process.env.REACT_APP_SERVER_URL}/partner/reception/getAmountRemaining`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "x-access-token": accessToken,
+            if (booking.status === "CheckedIn") {
+              fetch(
+                `${process.env.REACT_APP_SERVER_URL}/partner/reception/getAmountRemaining`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-access-token": accessToken,
                   },
-                  body: JSON.stringify({ roomNumbers: [booking.roomNumber], hotelId: booking.hotelId, }),
-                  })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    if (data.success === true) {
-                      amount = data.message.remainingBookingAmount + data.message.remainingFoodAmount;
-                    }
-                  });
+                  body: JSON.stringify({
+                    roomNumbers: [booking.roomNumber],
+                    hotelId: booking.hotelId,
+                  }),
+                }
+              )
+                .then((res) => res.json())
+                .then((data) => {
+                  if (data.success === true) {
+                    amount =
+                      data.message.remainingBookingAmount +
+                      data.message.remainingFoodAmount;
+                  }
+                });
             }
             const handleCheckIn = async () => {
               const roomNumbers = [booking.roomNumber];
-              const hotelId= booking.hotelId;
-              fetch(`${process.env.REACT_APP_SERVER_URL}/partner/reception/roomCheckin`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "x-access-token": accessToken,
-                },
-                body: JSON.stringify({ roomNumbers, hotelId }),
-              })
+              const hotelId = booking.hotelId;
+              fetch(
+                `${process.env.REACT_APP_SERVER_URL}/partner/reception/roomCheckin`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-access-token": accessToken,
+                  },
+                  body: JSON.stringify({ roomNumbers, hotelId }),
+                }
+              )
                 .then((res) => res.json())
                 .then((data) => {
                   console.log(data);
                   if (data.success === true) {
                     alert("Checked In");
                   }
-                  onSubmit({email: email});
-                }
-                );
-
+                  onSubmit({ email: email });
+                });
             };
 
             const handleCheckOut = async () => {
               const roomNumbers = [booking.roomNumber];
-              const hotelId= booking.hotelId;
-              const remainingAmount=amount;
-              fetch(`${process.env.REACT_APP_SERVER_URL}/partner/reception/roomCheckout`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "x-access-token": accessToken,
-                },
-                body: JSON.stringify({ bookingRooms: roomNumbers, hotelId ,remainingAmount , amount }),
-              })
+              const hotelId = booking.hotelId;
+              const remainingAmount = amount;
+              fetch(
+                `${process.env.REACT_APP_SERVER_URL}/partner/reception/roomCheckout`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-access-token": accessToken,
+                  },
+                  body: JSON.stringify({
+                    bookingRooms: roomNumbers,
+                    hotelId,
+                    remainingAmount,
+                    amount,
+                  }),
+                }
+              )
                 .then((res) => res.json())
                 .then((data) => {
                   console.log(data);
                   if (data.success === true) {
                     alert("Checked Out");
                   }
-                  onSubmit({email: email});
-                }
-                );
-
+                  onSubmit({ email: email });
+                });
             };
-            
+
             return (
               <div
                 key={index}
@@ -184,28 +197,35 @@ const Search = () => {
                 >
                   <div className="">Room Booked: {booking.roomNumber}</div>
                   <div>
-                    {new Date(booking.checkIn).toLocaleDateString()} to {new Date(booking.checkOut).toLocaleDateString()}
+                    {new Date(booking.checkIn).toLocaleDateString()} to{" "}
+                    {new Date(booking.checkOut).toLocaleDateString()}
                   </div>
-                  { booking.status === "CheckedIn" &&
+                  {booking.status === "CheckedIn" && (
                     <div className="">Amount Remaining: {amount}</div>
-                  }
+                  )}
 
                   <div className="">
-                    { booking.status === "Booked" && 
-                      <PrimaryButton  btnText={"Check In "} onClick={()=> handleCheckIn()}/>
-                    }  
-                     { booking.status === "CheckedIn" && 
-                      <PrimaryButton  btnText={"Check Out "} onClick={()=>handleCheckOut()}/>
-                    }     
+                    {booking.status === "Booked" && (
+                      <PrimaryButton
+                        btnText={"Check In "}
+                        onClick={() => handleCheckIn()}
+                      />
+                    )}
+                    {booking.status === "CheckedIn" && (
+                      <PrimaryButton
+                        btnText={"Check Out "}
+                        onClick={() => handleCheckOut()}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
             );
           })
         ) : (
-          <div className="bg-red-400 bg-green-400 bg-blue-400"></div>
+          <div className="pl-4 pt-4">No Bookings for the user</div>
         )}
-        </div>
+      </div>
     </div>
   );
 };
