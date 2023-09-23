@@ -1,103 +1,113 @@
 import React from "react";
+import { useForm } from "react-hook-form";
 import { UserContext } from "../../../Context/AllContexts";
-import { useNavigate } from "react-router-dom";
-import DatePicker from "react-date-picker";
 import PrimaryButton from "../../../common/Buttons/PrimaryButton";
-
-const Booking = () => {
-  const navigate = useNavigate();
+import { useNavigate } from "react-router-dom";
+const Search = () => {
   const { userData, setUserData, accessToken, setAccessToken } =
     React.useContext(UserContext);
-  const [bookingData, setBookingData] = React.useState([]);
-  const [day, setDay] = React.useState(new Date());
-  const getUserData = async (token) => {
-    const response = await fetch(
-      `${process.env.REACT_APP_SERVER_URL}/partner/reception`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "x-access-token": token,
-        },
-      }
-    );
+    const [loading, setLoading] = React.useState(false);
+    const navigate = useNavigate();
+    const [bookings , setBookings] = React.useState([]);
+    const [email , setEmail] = React.useState("");
 
-    const data = await response.json();
-    console.log(data);
-    if (data.success === true && data.data) {
-      setUserData(data.data);
+    const getUserData = async (token) => {
+        const response = await fetch(
+            `${process.env.REACT_APP_SERVER_URL}/partner/reception`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-access-token": token,
+                },
+            }
+        );
+
+        const data = await response.json();
+        console.log(data);
+        if (data.success === true && data.data) {
+            setUserData(data.data);
+        }
+    }
+
+    React.useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        if (!token && !accessToken) {
+            navigate("/login");
+        }
+        if (!accessToken) {
+            setAccessToken(token);
+        }
+        if (!userData) {
+            
+            getUserData(token);
+        }
+
+    }, []);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const onSubmit = async (data) => {
+    setEmail(data.email);
+    try {
+        fetch(`${process.env.REACT_APP_SERVER_URL}/partner/reception/getBookings`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-access-token": accessToken,
+            },
+            body: JSON.stringify({
+                email: data.email,
+                hotelId: userData.hotelDetails.hotelId,
+            }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+                if (data.success === true) {
+                    setBookings(data.message);
+                }
+            });
+
+    } catch (error) {
+        console.log(error);
     }
   };
-  React.useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token && !accessToken) {
-      navigate("/login");
-    }
-    if (!accessToken) {
-      setAccessToken(token);
-    }
-    if (!userData) {
-      
-      getUserData(token);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    if (userData) {
-      const bookingArray = userData.roomBookingDetails.roomBookedDetails.filter(
-        (booking) => {
-          const checkInDate = new Date(booking.checkIn);
-          const checkOutDate = new Date(booking.checkOut);
-
-          console.log("Check-in Date:", checkInDate);
-          console.log("Check-out Date:", checkOutDate);
-          console.log("Today:", day);
-          console.log(
-            "Comparison Result:",
-            checkInDate <= day && checkOutDate >= day
-          );
-
-          return checkInDate <= day && checkOutDate >= day;
-        }
-      );
-
-      const checkInArray =
-        userData.roomBookingDetails.roomCheckedInDetails.filter((booking) => {
-          const checkInDate = new Date(booking.checkIn);
-          const checkOutDate = new Date(booking.checkOut);
-
-          return checkInDate <= day && checkOutDate >= day;
-        });
-
-      const completeArray =
-        userData.roomBookingDetails.roomCompleteDetails.filter((booking) => {
-          const checkInDate = new Date(booking.checkIn);
-          const checkOutDate = new Date(booking.checkOut);
-          return checkInDate <= day && checkOutDate >= day;
-        });
-
-      console.log(bookingArray, checkInArray, completeArray);
-
-      setBookingData([...bookingArray, ...checkInArray, ...completeArray]);
-    }
-  }, [userData, day]);
-
-
   return (
-    <div className="w-full py-6 px-6">
-      <div className="flex gap-2   text-lg items-center">
-        <span className="font-bold text-primary">Bookings for</span>
-        <div className="mt-1">
-          <DatePicker
-            onChange={(value) => setDay(value)}
-            value={day}
-            format="dMMMy"
+    <div className="h-full w-full p-6">
+      <div className="text-primary text-xl font-bold">
+        Search for User Bookings
+      </div>
+      <form
+        className=" flex mt-8 gap-[10px] items-center"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div>
+          <input
+            type="text"
+            placeholder="Email"
+            {...register("email", { required: true })}
+            className="w-72 md:w-96  h-12 px-3 rounded-lg border-2 border-gray-200 outline-none focus:border-primary"
           />
         </div>
-      </div>
-      <div className="flex flex-row flex-wrap items-center py-6 gap-4">
-        {bookingData.length > 0 ? (
-          bookingData.map((booking, index) => {
+        <div className="w-24">
+          <PrimaryButton
+            type="submit"
+            classes=" !w-24"
+            // disabled={loading}
+            btnText="Search"
+          />
+        </div>
+
+      </form>
+
+      <div className="flex flex-wrap gap-3 items-center">
+
+      {bookings.length > 0 ? (
+          bookings.map((booking, index) => {
             let amount = 0;
             if(booking.status === "CheckedIn"){
               fetch(`${process.env.REACT_APP_SERVER_URL}/partner/reception/getAmountRemaining`, {
@@ -110,7 +120,6 @@ const Booking = () => {
                   })
                   .then((res) => res.json())
                   .then((data) => {
-                    console.log(data);
                     if (data.success === true) {
                       amount = data.message.remainingBookingAmount + data.message.remainingFoodAmount;
                     }
@@ -133,7 +142,7 @@ const Booking = () => {
                   if (data.success === true) {
                     alert("Checked In");
                   }
-                  getUserData(accessToken);
+                  onSubmit({email: email});
                 }
                 );
 
@@ -157,7 +166,7 @@ const Booking = () => {
                   if (data.success === true) {
                     alert("Checked Out");
                   }
-                  getUserData(accessToken);
+                  onSubmit({email: email});
                 }
                 );
 
@@ -196,14 +205,9 @@ const Booking = () => {
         ) : (
           <div className="bg-red-400 bg-green-400 bg-blue-400"></div>
         )}
-      </div>
+        </div>
     </div>
   );
 };
 
-export default Booking;
-
-
-// ${booking.status === "Booked" && "bg-green-400"}
-//                     ${booking.status === "Complete" && "bg-red-400"}
-//                       ${booking.status === "CheckedIn" && "bg-blue-400"}
+export default Search;

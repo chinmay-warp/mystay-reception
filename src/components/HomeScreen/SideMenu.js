@@ -19,14 +19,14 @@ function SideMenu({ property, owner }) {
       pathName: "bookings",
       comingSoon: false,
     },
-    // {
-    //   name: "Rooms",
-    //   imageUrl: (
-    //     <Room color={searchParams.get("show") === "rooms" ? "#ff5500" : ""} />
-    //   ),
-    //   pathName: "rooms",
-    //   comingSoon: false,
-    // },
+    {
+      name: "Search",
+      imageUrl: (
+        <Room color={searchParams.get("show") === "rooms" ? "#ff5500" : ""} />
+      ),
+      pathName: "search",
+      comingSoon: false,
+    },
     // {
     //   name: "Teams",
     //   imageUrl: (
