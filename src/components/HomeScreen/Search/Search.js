@@ -90,7 +90,7 @@ const Search = () => {
             type="text"
             placeholder="Email"
             {...register("email", { required: true })}
-            className="w-72 md:w-96  h-12 px-3 rounded-lg border-2 border-gray-200 outline-none focus:border-primary"
+            className="input input-bordered md:w-96 w-72  font-semibold"
           />
         </div>
         <div className="w-24">
@@ -98,7 +98,7 @@ const Search = () => {
             type="submit"
             classes=" !w-24"
             // disabled={loading}
-            btnText="Search"
+            text="Search"
           />
         </div>
       </form>

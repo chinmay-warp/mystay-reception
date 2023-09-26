@@ -45,7 +45,7 @@ const Login = () => {
     >
       <Card>
         <form
-          className="max-w-[340px] flex flex-col gap-[20px]"
+          className="w-[340px] flex flex-col gap-[20px]"
           onSubmit={handleSubmit(onSubmit)}
         >
           <p className="text-[22px] font-[700] block text-left mb-[10px]">
@@ -54,9 +54,9 @@ const Login = () => {
           <div>
             <input
               type="text"
-              placeholder="Email"
+              placeholder="Enter your email"
               {...register("email", { required: true })}
-              className="w-72 md:w-96 text-[14px] h-12 px-3 rounded-lg border-2 border-gray-200 outline-none focus:border-primary"
+              className="input input-bordered w-full max-w-[340px] text-[12px] font-semibold"
             />
           </div>
           <div className="relative">
@@ -64,10 +64,10 @@ const Login = () => {
               type={password}
               placeholder="Password"
               {...register("password", { required: true })}
-              className="w-72 md:w-96 text-[14px] h-12 px-3 rounded-lg border-2 border-gray-200 outline-none focus:border-primary"
+              className="input input-bordered w-full max-w-[340px] text-[12px] font-semibold"
             />
             <div
-              className="absolute top-1/2  -translate-y-1/2 cursor-pointer -right-4"
+              className="absolute top-1/2  -translate-y-1/2 cursor-pointer right-4"
               onMouseEnter={() => {
                 setPassword("text");
               }}
@@ -114,9 +114,9 @@ const Login = () => {
 
           <PrimaryButton
             type="submit"
-            classes=" !w-72 md:!w-96"
+            classes="!w-full"
             disabled={loading}
-            btnText="Login"
+            text="Login"
           />
 
           {/* <p className="text-[13px] font-[500]">
