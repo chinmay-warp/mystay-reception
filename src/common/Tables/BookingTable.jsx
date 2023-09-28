@@ -36,9 +36,6 @@ const BookingTable = ({ bookings, getUserData, accessToken }) => {
         day: "numeric",
         month: "short",
         year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
         timeZone: "Asia/Kolkata",
       };
 
@@ -52,7 +49,8 @@ const BookingTable = ({ bookings, getUserData, accessToken }) => {
   React.useEffect(() => {
     const bookingDetails = bookings.slice((current - 1) * 10, current * 10);
     setTickets(bookingDetails);
-  }, [current, sort]);
+    setTotal(bookings.length);
+  }, [current, sort, bookings]);
 
   const handlePrevious = () => {
     setCurrent((prev) => prev - 1);
@@ -67,32 +65,32 @@ const BookingTable = ({ bookings, getUserData, accessToken }) => {
   };
 
   return (
-    <div className="flex-grow overflow-auto max-w-[100%] min-h-[200px] mt-4 ml-6">
+    <div className="flex-grow overflow-auto max-w-[100%] mt-4 font-inter">
       {/* <div> */}
       {tickets?.length > 0 ? (
         <>
           <table className="table-auto mb-[30px]">
-            <thead className="">
+            <thead className="bg-[#E8F7FF]">
               <tr className="">
-                <th className="text-[12px] font-[600] text-left leading-[45px] w-[100px]">
-                  Room Number
+                <th className="text-[12px] font-[600] text-center leading-[45px] w-[100px]">
+                  Booking Id
                 </th>
-                <th className="text-[12px] font-[600] text-left leading-[45px] w-[250px]">
-                  CheckIn Date
+                <th className="text-[12px] font-[600] text-center leading-[45px] w-[250px]">
+                  Contact Info
                 </th>
-                <th className="text-[12px] font-[600] text-left leading-[45px] w-[250px]">
-                  Checkout Date
+                <th className="text-[12px] font-[600] text-center leading-[45px] w-[100px]">
+                  Guests
                 </th>
-                <th className="text-[12px] font-[600] text-left leading-[45px] w-[150px]">
-                  Total Amount
+                <th className="text-[12px] font-[600] text-center leading-[45px] w-[100px]">
+                  Room
                 </th>
-                <th className="text-[12px] font-[600] text-left leading-[45px] w-[150px]">
-                  Amount Paid
+                <th className="text-[12px] font-[600] text-center leading-[45px] w-[150px]">
+                  Booking Date
                 </th>
-                <th className="text-[12px] font-[600] text-left leading-[45px] w-[150px]">
-                  Mode
+                <th className="text-[12px] font-[600] text-center leading-[45px] w-[150px]">
+                  Reservation
                 </th>
-                <th className="text-[12px] font-[600] text-left relative leading-[45px] w-[100px] flex gap-8 items-center">
+                <th className="text-[12px] font-[600] text-center  leading-[45px] w-[200px] ">
                   <span>Status</span>
                   {/* <div
                     className="cursor-pointer"
@@ -167,7 +165,7 @@ const BookingTable = ({ bookings, getUserData, accessToken }) => {
               </tr>
             </thead>
 
-            <tbody className="md:w-[1020px]">
+            <tbody className="md:w-[1020px] max-h-[100px] overflow-y-scroll">
               {tickets.map((booking, index) => {
                 let amount = 0;
                 if (booking.status === "CheckedIn") {
@@ -251,24 +249,37 @@ const BookingTable = ({ bookings, getUserData, accessToken }) => {
                 return (
                   <React.Fragment key={index}>
                     <tr className="h-[55px] border-b">
-                      <td className="text-[12px] font-[400]">
-                        {booking.roomNumber}
+                      <td className="text-[12px] text-center font-[600]">
+                        {booking._id.slice(0, 12)}
                       </td>
-                      <td className="text-[12px] font-[400]">
-                        {formatTicketTime(booking.checkIn)}
+                      <td className="text-[12px] text-center font-[400] flex flex-col gap-1 items-center justify-center">
+                        <span className="font-bold">
+                          {booking.customerId?.firstName +
+                            " " +
+                            booking.customerId?.lastName}
+                        </span>
+                        {booking.customerId?.email && (
+                          <p className="text-[12px] text-center font-[400]">
+                            {booking.customerId?.email}
+                          </p>
+                        )}
                       </td>
-                      <td className="text-[12px] font-[400]">
-                        {formatTicketTime(booking.checkOut)}
-                      </td>
-                      <td className="text-[12px] font-[400]">
-                        {booking.totalRoomAmount.amount}
-                      </td>
+                      <td className="text-[12px] text-center font-[400]">2</td>
+                      <td className="text-[12px] text-center font-[400]">1</td>
 
-                      <td className="text-[12px] font-[400]">
-                        {booking.totalRoomAmount.paidAmount}
+                      <td className="text-[12px] text-center font-[600]">
+                        {formatTicketTime(booking.createdAt)}
                       </td>
-                      <td className="text-[12px] font-[400]">{booking.mode}</td>
-                      <td className="text-[12px] font-[400]">
+                      <td className="text-[12px] text-center  font-[400]">
+                        <p className="font-semibold">
+                          {formatTicketTime(booking.checkIn)}{" "}
+                          <span className="font-normal">To</span>{" "}
+                        </p>
+                        <p className="font-semibold">
+                          {formatTicketTime(booking.checkOut)}
+                        </p>
+                      </td>
+                      <td className="text-[12px] text-center font-[400]">
                         {booking.status === "Booked" && (
                           <PrimaryButton
                             text={"Check In "}
@@ -285,13 +296,13 @@ const BookingTable = ({ bookings, getUserData, accessToken }) => {
                         )}
                         {booking.status === "Complete" && (
                           <PrimaryButton
-                            text={"Checked Out "}
+                            text={"Complete"}
                             onClick={() => alert("Already Checked Out")}
                             tiny={true}
                           />
                         )}
                       </td>
-                      {/* <td className="text-[12px] font-[400] w-[100px]">
+                      {/* <td className="text-[12px] text-center font-[400] w-[100px]">
                           <a href={booking.payment.receiptUrl} target="_blank" className="rounded-[12px] p-[4px] text-white flex items-center justify-center bg-primary">View</a>
                         </td>  */}
                     </tr>

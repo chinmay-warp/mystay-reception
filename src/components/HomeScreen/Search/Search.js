@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { UserContext } from "../../../Context/AllContexts";
 import PrimaryButton from "../../../common/Buttons/PrimaryButton";
 import { useNavigate } from "react-router-dom";
+import BookingTable from "../../../common/Tables/BookingTable";
 const Search = () => {
   const { userData, setUserData, accessToken, setAccessToken } =
     React.useContext(UserContext);
@@ -105,123 +106,11 @@ const Search = () => {
 
       <div className="flex flex-wrap gap-3 items-center">
         {bookings.length > 0 ? (
-          bookings.map((booking, index) => {
-            let amount = 0;
-            if (booking.status === "CheckedIn") {
-              fetch(
-                `${process.env.REACT_APP_SERVER_URL}/partner/reception/getAmountRemaining`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "x-access-token": accessToken,
-                  },
-                  body: JSON.stringify({
-                    roomNumbers: [booking.roomNumber],
-                    hotelId: booking.hotelId,
-                  }),
-                }
-              )
-                .then((res) => res.json())
-                .then((data) => {
-                  if (data.success === true) {
-                    amount =
-                      data.message.remainingBookingAmount +
-                      data.message.remainingFoodAmount;
-                  }
-                });
-            }
-            const handleCheckIn = async () => {
-              const roomNumbers = [booking.roomNumber];
-              const hotelId = booking.hotelId;
-              fetch(
-                `${process.env.REACT_APP_SERVER_URL}/partner/reception/roomCheckin`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "x-access-token": accessToken,
-                  },
-                  body: JSON.stringify({ roomNumbers, hotelId }),
-                }
-              )
-                .then((res) => res.json())
-                .then((data) => {
-                  console.log(data);
-                  if (data.success === true) {
-                    alert("Checked In");
-                  }
-                  onSubmit({ email: email });
-                });
-            };
-
-            const handleCheckOut = async () => {
-              const roomNumbers = [booking.roomNumber];
-              const hotelId = booking.hotelId;
-              const remainingAmount = amount;
-              fetch(
-                `${process.env.REACT_APP_SERVER_URL}/partner/reception/roomCheckout`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "x-access-token": accessToken,
-                  },
-                  body: JSON.stringify({
-                    bookingRooms: roomNumbers,
-                    hotelId,
-                    remainingAmount,
-                    amount,
-                  }),
-                }
-              )
-                .then((res) => res.json())
-                .then((data) => {
-                  console.log(data);
-                  if (data.success === true) {
-                    alert("Checked Out");
-                  }
-                  onSubmit({ email: email });
-                });
-            };
-
-            return (
-              <div
-                key={index}
-                className="w-[250px] flex flex-col items-center justify-center rounded-xl  border"
-              >
-                <div
-                  className={`w-full flex flex-col items-center justify-around py-2  px-2 h-36 rounded-xl text-gray-600 
-                    
-                     `}
-                >
-                  <div className="">Room Booked: {booking.roomNumber}</div>
-                  <div>
-                    {new Date(booking.checkIn).toLocaleDateString()} to{" "}
-                    {new Date(booking.checkOut).toLocaleDateString()}
-                  </div>
-                  {booking.status === "CheckedIn" && (
-                    <div className="">Amount Remaining: {amount}</div>
-                  )}
-
-                  <div className="">
-                    {booking.status === "Booked" && (
-                      <PrimaryButton
-                        btnText={"Check In "}
-                        onClick={() => handleCheckIn()}
-                      />
-                    )}
-                    {booking.status === "CheckedIn" && (
-                      <PrimaryButton
-                        btnText={"Check Out "}
-                        onClick={() => handleCheckOut()}
-                      />
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })
+          <BookingTable
+            bookings={bookings}
+            accessToken={accessToken}
+            getUserData={getUserData}
+          />
         ) : (
           <div className="pl-4 pt-4">No Bookings for the user</div>
         )}

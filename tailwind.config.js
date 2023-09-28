@@ -6,6 +6,9 @@ module.exports = {
       colors: {
         primary: "#ff5500",
       },
+      fontFamily: {
+        inter: ["Inter", "sans-serif"],
+      },
     },
   },
   plugins: [require("tailwind-scrollbar-hide"), require("daisyui")],

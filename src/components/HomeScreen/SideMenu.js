@@ -13,7 +13,7 @@ function SideMenu({ property, owner }) {
       name: "Booking Info",
       imageUrl: (
         <Home
-          color={searchParams.get("show") === "propertyInfo" ? "#ff5500" : ""}
+          color={searchParams.get("show") === "bookings" ? "#ff5500" : "#000"}
         />
       ),
       pathName: "bookings",
@@ -22,7 +22,9 @@ function SideMenu({ property, owner }) {
     {
       name: "Search",
       imageUrl: (
-        <Room color={searchParams.get("show") === "rooms" ? "#ff5500" : ""} />
+        <Room
+          color={searchParams.get("show") === "search" ? "#ff5500" : "#000"}
+        />
       ),
       pathName: "search",
       comingSoon: false,
@@ -106,29 +108,48 @@ function SideMenu({ property, owner }) {
   // ${
   //     singleEvent.isMockEvent ? "h-[calc(100vh_-_98px)]" : " h-[calc(100vh_-_58px)]"
   // }
+
   return (
     <aside
       className={`hidden md:block w-[228px] fixed h-screen border-r border-[#C5C5C766] border-opacity-40 rounded bg-white aria-label=Sidebar md:h-[90%] overflow-y-scroll overflow-x-hidden scrollbar-hide md:pb-7`}
     >
-      <div className="bg-white">
-        <div className="">
-          <div className="text-[16px] font-[600] relative left-[25px] top-[25px] break-normal w-[140px] hover:underline cursor-pointer">
-            <div className="line-clamp-3">
-              {userData?.hotelDetails?.hotelName
-                ? userData.hotelDetails.hotelName.charAt(0).toUpperCase() +
-                  userData.hotelDetails.hotelName.slice(1, userData.hotelDetails.hotelName.length)
-                : null}
-            </div>
-          </div>
-          <i className="fa-solid fa-up-right-from-square absolute right-[43px] mt-1 cursor-pointer text-primary ml-2"></i>
-
-          <i className="fa-regular fa-copy absolute right-[13px] mt-1 cursor-pointer text-primary "></i>
+      <div className="bg-white w-full">
+        <div className="mt-4 w-full flex flex-row gap-2 items-center justify-center font-inter font-semibold text-base">
+          {userData?.hotelDetails?.hotelName
+            ? userData.hotelDetails.hotelName.charAt(0).toUpperCase() +
+              userData.hotelDetails.hotelName.slice(
+                1,
+                userData.hotelDetails.hotelName.length
+              )
+            : null}
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 17 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4.95831 12.0417L12.0416 4.95837"
+              stroke="black"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M4.95831 4.95837H12.0416V12.0417"
+              stroke="black"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </div>
 
-
         {/* <p className="">{}</p> */}
-        <ul className="pt-10">
+        <ul className="pt-6">
           {navbarContent &&
+            userData &&
             navbarContent.length > 0 &&
             navbarContent.map((navbar, index) => {
               if (
@@ -139,9 +160,7 @@ function SideMenu({ property, owner }) {
                   <li key={index} className="relative">
                     <div
                       onClick={() => {
-                        navigate(
-                          `?show=${navbar.pathName}`
-                        );
+                        navigate(`?show=${navbar.pathName}`);
                       }}
                       className={`flex cursor-pointer text-[#9a9a9a] items-center pl-5 py-3.5 text-[11px] font-[500] border-b border-[#C5C5C766] border-opacity-40 ${
                         searchParams.get("show") === navbar.pathName
