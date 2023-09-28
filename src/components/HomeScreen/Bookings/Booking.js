@@ -172,9 +172,11 @@ const Booking = () => {
     console.log(bookingData, "yo");
   }, [bookingData]);
 
-  const handleWeek = () => {
+  const handleWeek = (week = 1) => {
     let yesterday = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const today = new Date(yesterday.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const today = new Date(
+      yesterday.getTime() - 7 * week * 24 * 60 * 60 * 1000
+    );
     const tomorrow = new Date(yesterday.getTime());
 
     setDates([today, tomorrow]);
@@ -267,24 +269,28 @@ const Booking = () => {
             />
           </div>
 
-          <div
-            className="p-2 border rounded-md border-[#d8d8d8] font-inter text-[14px] cursor-pointer"
-            onClick={() => {
-              handleWeek();
+          <select
+            className="select select-bordered w-full max-w-xs"
+            onChange={(e) => {
+              if (e.target.value === "week1") {
+                handleWeek(1);
+              } else if (e.target.value === "week2") {
+                handleWeek(2);
+              } else if (e.target.value === "month1") {
+                handleMonths(1);
+              } else if (e.target.value === "month3") {
+                handleMonths(3);
+              }
             }}
           >
-            {" "}
-            Last week
-          </div>
-          <div
-            className="p-2 border rounded-md border-[#d8d8d8] font-inter text-[14px] cursor-pointer"
-            onClick={() => {
-              handleMonths(1);
-            }}
-          >
-            {" "}
-            Last month
-          </div>
+            <option disabled selected>
+              Custom range
+            </option>
+            <option value="week1">Last week</option>
+            <option value="week2">Last 2 weeks</option>
+            <option value="month1">Last month</option>
+            <option value="month3">Last 3 month</option>
+          </select>
         </div>
       </div>
       <div className="flex flex-row flex-wrap  items-center py-6 gap-4">
