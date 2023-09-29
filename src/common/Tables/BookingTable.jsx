@@ -345,7 +345,7 @@ const BookingTable = ({ bookings, getUserData, accessToken }) => {
                 }}
                 className={`
               w-[75px]
-              peer bg-white border-2 border-primary rounded-[5px] text-gray-900 text-[12px] placeholder-transparent focus:ring-transparent py-0 bg-[right] 1.5rem cursor-pointer
+              peer bg-white border-2 border-primary rounded-[5px] text-gray-900 text-[12px] placeholder-transparent focus:ring-transparent py-0 1.5rem cursor-pointer
               bg-center `}
               >
                 {Array.from({ length: totalPages }).map((_, index) => (

@@ -270,7 +270,7 @@ const Booking = () => {
           </div>
 
           <select
-            className="select select-bordered w-full max-w-xs"
+            className="select select-bordered w-36 max-w-xs font-semibold text-[14px] p-2"
             onChange={(e) => {
               if (e.target.value === "week1") {
                 handleWeek(1);
